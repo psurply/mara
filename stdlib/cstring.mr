@@ -1,0 +1,117 @@
+##
+## cstring.mr for Mara
+##
+## Copyright (C) 2013 Pierre Surply
+## <pierre.surply@gmail.com>
+##
+## This file is part of Mara.
+##
+##    Mara is free software: you can redistribute it and/or modify
+##    it under the terms of the GNU General Public License as published by
+##    the Free Software Foundation, either version 3 of the License, or
+##    (at your option) any later version.
+##
+##    Mara is distributed in the hope that it will be useful,
+##    but WITHOUT ANY WARRANTY; without even the implied warranty of
+##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##    GNU General Public License for more details.
+##
+##    You should have received a copy of the GNU General Public License
+##    along with Mara.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+extern strcasecmp       : cstring -> cstring -> integer
+extern strcasestr       : cstring -> cstring -> cstring
+extern strcat           : cstring -> cstring -> cstring
+extern strchr           : cstring -> integer -> cstring
+extern strchrnul        : cstring -> integer -> cstring
+extern strcmp           : cstring -> cstring -> integer
+extern strcpy           : cstring -> cstring -> cstring
+extern strcspn          : cstring -> cstring -> integer
+extern strdup           : cstring -> cstring
+extern strlcat          : cstring -> cstring -> integer -> integer
+extern strlcpy          : cstring -> cstring -> integer -> integer
+extern strlen           : cstring -> integer
+extern strlwr           : cstring -> cstring
+extern strncasecmp      : cstring -> cstring -> integer -> integer
+extern strncat          : cstring -> cstring -> integer -> integer
+extern strncmp          : cstring -> cstring -> integer -> integer
+extern strncpy          : cstring -> cstring -> integer -> cstring
+extern strnlen          : cstring -> integer -> integer
+extern strpbrk          : cstring -> integer -> cstring
+extern strrchr          : cstring -> integer
+extern strrev           : cstring -> cstring
+extern strsep           : undef -> cstring -> cstring
+extern strspn           : cstring -> cstring -> integer
+extern strstr           : cstring -> cstring -> cstring
+extern strtok           : cstring -> cstring -> cstring
+extern strupr           : cstring -> cstring
+
+func is_nbr(cstring : s)
+  var i <- 0
+  var c <- 0
+  var b <- 10
+  if s[0] = '0' then
+    if s[1] = 'x' then
+      b <- 16
+      i <- 2
+    elif s[1] = 'b' then
+      b <- 2
+      i <- 2
+    endif
+  endif
+  c <- s[i]
+  while c do
+    if not ((b = 10 and '0' <= c  and c <= '9') or \
+            (b = 2 and ('0' = c  or c = '1')) or \
+            (b = 16 and (('0' <= c  and c <= '9') or \
+                        ('a' <= c  and c <= 'f') or \
+                        ('A' <= c  and c <= 'F')))) then
+      return false
+    endif
+    i ++ 1
+    c <- s[i]
+  done
+  return true
+end
+
+func atoi(cstring : s)
+  var i <- 0
+  var a <- 0
+  var c <- 0
+  if s[0] = '0' and  \
+     (s[1] = 'x') then
+    i <- 2
+    c <- s[i]
+    while c do
+      a <<<< 4
+      if 'A' <= c and c <= 'F' then
+        c <- c - 'A' + 0xA
+      elif 'a' <= c and c <= 'f' then
+        c <- c - 'a' + 0xA
+      else
+        c <- c - '0'
+      endif
+      a || c
+      i ++ 1
+      c <- s[i]
+    done
+  elif (s[0] = '0') and  \
+       (s[1] = 'b') then
+    i <- 2
+    c <- s[i]
+    while c do
+      a <<<< 1
+      a || c - '0'
+      i ++ 1
+      c <- s[i]
+    done
+  else
+    while s[i] do
+      a ** 10
+      a ++ s[i] - '0'
+      i ++ 1
+    done
+  endif
+  return a
+end

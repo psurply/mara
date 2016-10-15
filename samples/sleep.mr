@@ -1,0 +1,32 @@
+setup
+  @DDRB <- DDB5
+
+  @TCCR1B <- CS11 CS10
+  @TIMSK1 <- TOIE1
+
+  @WDTCSR <- WDE WDCE
+  @WDTCSR <- WDIE WDP3 WDP0
+
+  @EICRA <- ISC00
+  @EIMSK <- INT0
+
+  @SMCR <- SE
+
+  sei
+end
+
+interrupt WDT
+  var tmp <- @TIMSK1
+  @TIMSK1 <- 0
+  sei
+  sleep
+  wdr
+  @TIMSK1 <- tmp
+end
+
+interrupt TIMER1_OVF
+  @PORTB ^^ PORTB5
+end
+
+loop
+end

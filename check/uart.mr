@@ -1,0 +1,44 @@
+# UART
+
+using cstring
+using string
+
+func uart_init(rate)
+  @UBRR0H:UBRR0L <- rate
+  @UCSR0A <- U2X0
+  @UCSR0B <- TXEN0 RXEN0
+  @UCSR0C <- UCSZ01 UCSZ00
+end
+
+func uart_send(x)
+  waitfor not (@UCSR0A bitand UDRE0)
+  @UDR0 <- x
+end
+
+func uart_available()
+  return (@UCSR0A bitand RXC0) > 0
+end
+
+func uart_recv()
+  return @UDR0
+end
+
+func uart_write(cstring : s)
+  var i <- 0
+  var c <- s[0]
+
+  while c do
+    uart_send(c)
+    i ++ 1
+    c <- s[i]
+  done
+end
+
+func uart_newline()
+  uart_write("\n\r")
+end
+
+func uart_writef(buff, fmt, vect : args)
+  buff.format(fmt, args)
+  uart_write(buff.s)
+end

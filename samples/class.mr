@@ -1,0 +1,71 @@
+using string
+
+class tuple2
+  attr a        : integer
+  attr b        : integer
+
+  method init(a, b)
+    self.a <- a
+    self.b <- b
+    return self
+  end
+
+  method destr()
+    return self
+  end
+
+  method add(t)
+    return new tuple2(self.a + t.a, self.b + t.b)
+  end
+
+  method sum()
+    return self.a + self.b
+  end
+end
+
+class tuple3 : tuple2
+  attr c : integer
+
+  method init(a, b, c)
+    (tuple2 : self).init(a, b)
+    self.c <- c
+    return self
+  end
+
+  method add(t)
+    return new tuple3(self.a + t.a, self.b + t.b, self.c + t.c)
+  end
+end
+
+setup
+  var t1 <- new tuple3(1, 2, 3)
+  var t2 <- new tuple3(4, 5, 6)
+  var t <- t1.add(t2)
+  var s <- new string(256)
+
+  del t1
+  del t2
+
+  @UBRR0H:UBRR0L <- 16
+  @UCSR0A <- U2X0
+  @UCSR0B <- RXCIE0 TXEN0 RXEN0
+  @UCSR0C <- UCSZ01 UCSZ00
+
+  sei
+end
+
+interrupt USART_RX
+  @UDR0
+  s.format("t.a = %d\n\r"               \
+           "t.b = %d\n\r"               \
+           "t.c = %d\n\r"               \
+           "t.a + t.b = %d\n\r",        \
+           {t.a; t.b; t.c; t.sum()})
+  for i <- 0 to s.length() - 1 do
+    waitfor not (@UCSR0A bitand UDRE0)
+    @UDR0 <- s[i]
+  done
+end
+
+loop
+end

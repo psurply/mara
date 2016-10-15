@@ -1,0 +1,22 @@
+using cstring
+
+setup
+  @UBRR0H:UBRR0L <- 16
+  @UCSR0A <- U2X0
+  @UCSR0B <- TXEN0
+  @UCSR0C <- UCSZ01 UCSZ00
+
+  var s <- "Hello World !\n\r"
+  var i <- 0
+  var c <- s[0]
+
+  while c do
+    waitfor not (@UCSR0A bitand UDRE0)
+    @UDR0 <- s[i]
+    i ++ 1
+    c <- s[i]
+  done
+end
+
+loop
+end

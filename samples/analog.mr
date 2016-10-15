@@ -1,0 +1,30 @@
+using string
+using list
+
+setup
+  @UBRR0H:UBRR0L <- 16
+  @UCSR0A <- U2X0
+  @UCSR0B <- TXEN0
+  @UCSR0C <- UCSZ01 UCSZ00
+
+  @TCCR1B <- CS12
+  @TIMSK1 <- TOIE1
+
+  @ADCSRB <- ADTS2 ADTS1
+  @ADMUX <- REFS0
+  @ADCSRA <- ADEN ADATE ADIF ADIE ADPS2 ADPS1 ADPS0
+
+  var s <- new string(64)
+  sei
+end
+
+interrupt ADC
+  s.format("\rAnalog read : %x     ", {@ADCH:ADCL})
+  for i <- 0 to s.length() - 1 do
+    waitfor not (@UCSR0A bitand UDRE0)
+    @UDR0 <- s[i]
+  done
+end
+
+loop
+end

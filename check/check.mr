@@ -1,0 +1,81 @@
+using string
+using uart
+using test
+using list
+using random
+
+func check(buff, test, exp, a, b)
+  var f <- none
+  var res <- 0
+  uart_write("## Begin check\n\r")
+  for i <- 0 to vect_len(test) - 1 do
+    f <- (integer -> integer -> integer: test[i])
+    uart_writef(buff, "- test%d()\t", {i + 1})
+    res <- f(a, b)
+    if res <> ((vect : exp)[i]) then
+      uart_writef(buff, "-> FAILED : %d (expected %d)\n\r",     \
+                  {res; exp[i]})
+      i <- vect_len(test)
+    else
+      uart_writef(buff, "-> OK (%d)\n\r", {res})
+    endif
+  done
+  uart_write("## End\n\r")
+  waitfor not uart_available()
+  uart_recv()
+end
+
+setup
+  var buff <- new string(256)
+  var test <- {test1; test2; test3; test4; test5;       \
+               test6; test7; test8; test9; test10;      \
+               test11; test12; test13; test14; test15;  \
+               test16; test17; test18; test19; test20;  \
+               test21; test22; test23; test24; test25;  \
+               test26; test27; test28; test29; test30;  \
+               test31; test32; test33; test34; test35;  \
+               test36}
+  var exp <- {1379; 1295; 56154; 31; 35;                \
+              1379; 1295; 56154; 31; 35;                \
+              40; 1339; 1299; 5348; 334;                \
+              40; 1339; 1299; 168; 10;                  \
+              true; true; false; false; 123;            \
+              1379; 6; 5; true; true;                   \
+              'l'; 'E'; 123; 1383; 31;                  \
+              7}
+  var a <- 1337
+  var b <- 42
+  var counter <- 0
+
+  uart_init(16)
+  @UCSR0B || RXCIE0
+
+  @DDRB <- 0xFF
+  @PORTB <- 0xFF
+
+  @TCCR1B <- CS12 CS10
+  @TIMSK1 <- TOIE1
+
+  uart_writef(buff, "Frame pointer : %x\n\r",   \
+              {asm "movw r24, r28"})
+
+  check(buff, test, exp, a, b)
+  srandom(42)
+
+  sei
+end
+
+interrupt USART_RX
+  uart_writef(buff, "Random value : %x\n\r",   \
+              {random()})
+  @UDR0
+end
+
+interrupt TIMER1_OVF
+  uart_writef(buff, "[%x]\n\r",        \
+              {counter})
+  counter ++ 1
+end
+
+loop
+end

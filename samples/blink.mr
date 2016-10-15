@@ -1,0 +1,15 @@
+setup
+  @DDRB <- DDB5
+
+  @TCCR1B <- CS11 CS10
+  @TIMSK1 <- TOIE1
+
+  sei
+end
+
+interrupt TIMER1_OVF
+  @PORTB ^^ PORTB5
+end
+
+loop
+end

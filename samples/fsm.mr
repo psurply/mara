@@ -1,0 +1,85 @@
+using cstring
+
+func uart_print(cstring : s)
+  var i <- 0
+  var c <- s[0]
+
+  while c do
+    waitfor not (@UCSR0A bitand UDRE0)
+    @UDR0 <- c
+    i ++ 1
+    c <- s[i]
+  done
+end
+
+fsm auto
+  integer buff
+
+  input a <- self.buff = 'a'
+  input b <- self.buff = 'b'
+  input other <- true
+
+  state start
+    action
+      self.buff = 0
+      uart_print("Start\n\r")
+    end
+    a -> s1
+    other -> failure
+  end
+
+  state s1
+    action
+      uart_print("State 1\n\r")
+    end
+    a -> s2
+    b -> s1
+    other -> failure
+  end
+
+  state s2
+    action
+      uart_print("State 2\n\r")
+    end
+    b -> s3
+    other -> failure
+  end
+
+  state s3
+    action
+      uart_print("State 3\n\r")
+    end
+    b -> s2
+    a -> success
+    other -> failure
+  end
+
+  state success
+    action
+      uart_print("Success !\n\r")
+    end
+  end
+
+  state failure
+    action
+      uart_print("Failure ! Try again\n\r")
+    end
+    other -> start
+  end
+end
+
+setup
+  @UBRR0H:UBRR0L <- 16
+  @UCSR0A <- U2X0
+  @UCSR0B <- TXEN0 RXEN0
+  @UCSR0C <- UCSZ01 UCSZ00
+  var auto <- new auto()
+  auto.update()
+end
+
+loop
+  waitfor not (@UCSR0A bitand RXC0)
+  auto.buff <- @UDR0
+  auto.update()
+  auto.update()
+end

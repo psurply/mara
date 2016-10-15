@@ -1,0 +1,14 @@
+*~
+*.o
+*.hex
+*.elf
+*_build/
+*_mbuild/
+*.native
+marac
+mara.cgi
+compiler/test/
+out.dot
+website/res/img/graph/*.svg
+*.tar.gz
+mara_r*

@@ -1,0 +1,184 @@
+##
+## list.mr for Mara
+##
+## Copyright (C) 2013 Pierre Surply
+## <pierre.surply@gmail.com>
+##
+## This file is part of Mara.
+##
+##    Mara is free software: you can redistribute it and/or modify
+##    it under the terms of the GNU General Public License as published by
+##    the Free Software Foundation, either version 3 of the License, or
+##    (at your option) any later version.
+##
+##    Mara is distributed in the hope that it will be useful,
+##    but WITHOUT ANY WARRANTY; without even the implied warranty of
+##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##    GNU General Public License for more details.
+##
+##    You should have received a copy of the GNU General Public License
+##    along with Mara.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+using vect
+
+class list_node
+  attr value    : undef
+  attr next     : list_node
+
+  method init(value, next)
+    self.value <- value
+    self.next <- next
+
+    return self
+  end
+
+  method length()
+    if self.next then
+      return 1 + self.next.length()
+    else
+      return 1
+    endif
+  end
+end
+
+class list
+  attr length   : integer
+  attr first    : list_node
+
+  method init(v)
+    var l <- none
+    self.first <- none
+    self.length <- vect_len(v)
+
+    if self.length > 0 then
+      l <- new list_node(v[0], none)
+      self.first <- l
+    endif
+
+    for i <- 1 to self.length - 1 do
+      l.next <- new list_node(v[i], none)
+      l <- l.next
+    done
+
+    return self
+  end
+
+  method destr()
+    while self.first do
+      var l <- self.first.next
+      del self.first
+      self.first <- l
+    done
+    return self
+  end
+
+  method push(value)
+    self.first <- new list_node(value, self.first)
+    self.length ++ 1
+  end
+
+  method pop()
+    if self.length then
+      var l <- self.first.next
+      var v <- self.first.value
+      del self.first
+      self.first <- l
+      self.length -- 1
+
+      return v
+    else
+      return 0
+    endif
+  end
+
+  method get(id)
+    var l <- self.first
+    id:: l <- l.next
+    return l.value
+  end
+
+  method set(i, x)
+    if i < self.length then
+      var l <- self.first
+      i:: l <- l.next
+      l.value <- x
+    endif
+  end
+
+  method insert(i, x)
+    if i > 0 then
+      var l <- self.first
+      (i-1):: l <- l.next
+      l.next <- new list_node(x, l.next)
+      self.length ++ 1
+    else
+      self.push(x)
+    endif
+  end
+
+  method map(f)
+    var l <- self.first
+    for i <- 0 to self.length - 1 do
+      l.value <- f(l.value)
+      l <- l.next
+    done
+  end
+
+  method mapi(f)
+    var l <- self.first
+    for i <- 0 to self.length - 1 do
+      l.value <- f(i, l.value)
+      l <- l.next
+    done
+  end
+
+  method iter(f)
+    var l <- self.first
+    for i <- 0 to self.length - 1 do
+      f(l.value)
+      l <- l.next
+    done
+  end
+
+  method iteri(f)
+    var l <- self.first
+    for i <- 0 to self.length - 1 do
+      f(i, l.value)
+      l <- l.next
+    done
+  end
+
+  method fold_left(f, a)
+    var l <- self.first
+    for i <- 0 to self.length - 1 do
+      a <- f(a, l.value)
+      l <- l.next
+    done
+    return a
+  end
+
+  method for_all(f)
+    var l <- self.first
+    for i <- 0 to self.length - 1 do
+      if not (f(l.value)) then
+        return false
+      endif
+      l <- l.next
+    done
+
+    return true
+  end
+
+  method exists(f)
+    var l <- self.first
+    for i <- 0 to self.length - 1 do
+      if not (f(l.value)) then
+        return true
+      endif
+      l <- l.next
+    done
+
+    return false
+  end
+end

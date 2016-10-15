@@ -1,0 +1,30 @@
+R13 2013-08-29
+  - Improved syntax (not backward-compatible)
+  - Added direct addressing mode
+  - Improved type inference
+  - Added function pointers
+  - Added anonymous functions
+  - Added ISR support
+  - Added get/set operator
+  - Added vect data type
+  - Read-Only data are now always stored in program memory
+  - Added C interfacing
+  - Added minimal AVR-libc binding
+  - Added inheritance (OOP)
+  - Fixed 'call' bug for Atmega8
+  - 'and' and 'or' operators are now executed sequentially
+  - Improved Mara compiler usage
+  - Added cast in function argument
+R8 2013-04-29
+  - Improved error messages
+  - Added term mode (including umara compiler and VM)
+  - AVR-GCC is now executed properly by marac
+  - Improved string parsing
+  - Improved standard library (EEPROM, string, ...)
+  - Fixed many bugs...
+R5 2013-04-15
+  - Added Finite-State Machine
+  - Improved compound assignment
+  - Added Website
+  - Removed all ocamlyacc reduce/shift conflicts
+  - Fixed many bugs

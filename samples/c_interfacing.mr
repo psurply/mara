@@ -1,0 +1,32 @@
+using list
+using string
+
+extern list_sum         : list -> integer
+extern vect_sum         : vect -> integer
+
+setup
+  var s <- new string(64)
+  var l <- [1; 2; 3; 4]
+  var v <- {5; 6; 7; 8}
+
+  @UBRR0H:UBRR0L <- 16
+  @UCSR0A <- U2X0
+  @UCSR0B <- RXCIE0 TXEN0 RXEN0
+  @UCSR0C <- UCSZ01 UCSZ00
+
+  sei
+end
+
+interrupt USART_RX
+  @UDR0
+  s.format("list_sum([1; 2; 3; 4]) = %d\n\r"    \
+           "vect_sum({5; 6; 7; 8}) = %d\n\r",   \
+           {list_sum(l); vect_sum(v)})
+  for i <- 0 to s.length() - 1 do
+    waitfor not (@UCSR0A bitand UDRE0)
+    @UDR0 <- s[i]
+  done
+end
+
+loop
+end

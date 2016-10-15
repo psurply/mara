@@ -1,0 +1,55 @@
+using string
+using list
+
+func print(s)
+  for i <- 0 to s.length() - 1 do
+    waitfor not (@UCSR0A bitand UDRE0)
+    @UDR0 <- s[i]
+  done
+end
+
+setup
+  var buff <- new string(256)
+  var tick <- true
+  var suffix <- none
+  var nsuffix <- none
+
+  @DDRB <- DDB5
+
+  @TCCR1B <- CS11 CS10
+  @TIMSK1 <- TOIE1
+
+  @UBRR0H:UBRR0L <- 16
+  @UCSR0A <- U2X0
+  @UCSR0B <- TXEN0
+  @UCSR0C <- UCSZ01 UCSZ00
+
+  sei
+end
+
+interrupt TIMER1_OVF
+  @PORTB ^^ PORTB5
+  tick <- false
+end
+
+loop
+  suffix <- "s"
+  for i <- 99 downto 1 do
+    nsuffix <- i - 2 and i - 1 ? "s" : ""
+    buff.format("%d bottle%s of beer on the wall, %d bottle%s of beer.\n\r" \
+                "Take one down and pass it around, %d bottle%s of beer " \
+                "on the wall.\n\n\r", \
+                {i; suffix; i; suffix; i - 1; nsuffix})
+    print(buff)
+    waitfor tick
+    tick <- true
+    suffix <- nsuffix
+  done
+
+  buff.write("No more bottles of beer on the wall, no more bottles of beer." \
+             "\n\rGo to the store and buy some more, 99 bottles of beer" \
+             "on the wall.\n\n\r")
+  print(buff)
+  waitfor tick
+  tick <- true
+end

@@ -1,0 +1,22 @@
+setup
+  @DDRB <- DDB5
+
+  @EICRA <- ISC01 ISC00
+  @EIMSK <- INT0
+
+  @WDTCSR <- WDE WDCE
+  @WDTCSR <- WDIE WDP3
+
+  sei
+end
+
+interrupt WDT
+  @PORTB ^^ PORTB5
+end
+
+interrupt INT0
+  wdr
+end
+
+loop
+end

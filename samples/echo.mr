@@ -1,0 +1,15 @@
+setup
+  @UBRR0H:UBRR0L <- 16
+  @UCSR0A <- U2X0
+  @UCSR0B <- RXCIE0 TXEN0 RXEN0
+  @UCSR0C <- UCSZ01 UCSZ00
+
+  sei
+end
+
+interrupt USART_RX
+  @UDR0 <- @UDR0
+end
+
+loop
+end

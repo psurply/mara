@@ -1,0 +1,15 @@
+setup
+  @DDRB <- DDB5
+
+  @EICRA <- ISC00
+  @EIMSK <- INT0
+
+  sei
+end
+
+interrupt INT0
+  @PORTB ^^ PORTB5
+end
+
+loop
+end

@@ -1,0 +1,57 @@
+##
+## vect.mr for Mara
+##
+## Copyright (C) 2013 Pierre Surply
+## <pierre.surply@gmail.com>
+##
+## This file is part of Mara.
+##
+##    Mara is free software: you can redistribute it and/or modify
+##    it under the terms of the GNU General Public License as published by
+##    the Free Software Foundation, either version 3 of the License, or
+##    (at your option) any later version.
+##
+##    Mara is distributed in the hope that it will be useful,
+##    but WITHOUT ANY WARRANTY; without even the implied warranty of
+##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##    GNU General Public License for more details.
+##
+##    You should have received a copy of the GNU General Public License
+##    along with Mara.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+using mem
+
+func vect_len(v)
+  return asm{(vect : v)} "movw r30, r24
+                          ld   r24, Z
+                          ldd  r25, Z+1"
+end
+
+func vect_create(len, value)
+  var v <- malloc(len << 1 + 2)
+
+  asm{(vect : v)}       "movw r30, r24"
+  asm{len}              "st   Z, r24
+                         std  Z+1, r25"
+
+  for i <- 0 to len - 1 do
+    v[i] <- value
+  done
+
+  return v
+end
+
+func vect_init(len, init)
+  var v <- malloc(len << 1 + 2)
+
+  asm{(vect : v)}       "movw r30, r24"
+  asm{len}              "st   Z, r24
+                         std  Z+1, r25"
+
+  for i <- 0 to len - 1 do
+    v[i] <- init(i)
+  done
+
+  return v
+end

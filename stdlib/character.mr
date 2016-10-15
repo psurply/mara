@@ -1,0 +1,38 @@
+##
+## character.mr for Mara
+##
+## Copyright (C) 2013 Pierre Surply
+## <pierre.surply@gmail.com>
+##
+## This file is part of Mara.
+##
+##    Mara is free software: you can redistribute it and/or modify
+##    it under the terms of the GNU General Public License as published by
+##    the Free Software Foundation, either version 3 of the License, or
+##    (at your option) any later version.
+##
+##    Mara is distributed in the hope that it will be useful,
+##    but WITHOUT ANY WARRANTY; without even the implied warranty of
+##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##    GNU General Public License for more details.
+##
+##    You should have received a copy of the GNU General Public License
+##    along with Mara.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+extern isalnum  : integer -> integer
+extern isalpha  : integer -> integer
+extern isascii  : integer -> integer
+extern isblank  : integer -> integer
+extern iscntrl  : integer -> integer
+extern isdigit  : integer -> integer
+extern isgraph  : integer -> integer
+extern islower  : integer -> integer
+extern isprint  : integer -> integer
+extern ispunct  : integer -> integer
+extern isspace  : integer -> integer
+extern isupper  : integer -> integer
+extern isxdigit : integer -> integer
+extern toascii  : integer -> integer
+extern tolower  : integer -> integer
+extern toupper  : integer -> integer

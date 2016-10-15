@@ -1,0 +1,179 @@
+##
+## string.mr for Mara
+##
+## Copyright (C) 2013 Pierre Surply
+## <pierre.surply@gmail.com>
+##
+## This file is part of Mara.
+##
+##    Mara is free software: you can redistribute it and/or modify
+##    it under the terms of the GNU General Public License as published by
+##    the Free Software Foundation, either version 3 of the License, or
+##    (at your option) any later version.
+##
+##    Mara is distributed in the hope that it will be useful,
+##    but WITHOUT ANY WARRANTY; without even the implied warranty of
+##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##    GNU General Public License for more details.
+##
+##    You should have received a copy of the GNU General Public License
+##    along with Mara.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+using mem
+using cstring
+using list
+using vect
+
+class string
+  attr size     : integer
+  attr s        : cstring
+
+  method init(size)
+    self.size <- size
+    self.s <- malloc(size)
+    self.s[0] <- 0
+    return self
+  end
+
+  method destr()
+    free(self.s)
+    return self
+  end
+
+  method set(i, x)
+    self.s[i] <- x
+  end
+
+  method get(i)
+    return self.s[i]
+  end
+
+  method length()
+    strlen(self.s)
+  end
+
+  method write_from(cstring : s, integer : n)
+    return strlcpy((cstring : (integer : self.s) + n), s, self.size)
+  end
+
+  method write(s)
+    return self.write_from(s, 0)
+  end
+
+  method cat(s)
+    return strlcat(self.s, s, self.size)
+  end
+
+  method append_char(c)
+    var i <- 0
+    while self.s[i] do
+      i ++ 1
+    done
+    if i + 1 < self.size then
+      self.s[i] <- c
+      self.s[i + 1] <- 0
+      return true
+    else
+      return false
+    endif
+  end
+
+  method delete_char()
+    var i <- 0
+    while self.s[i] do
+      i ++ 1
+    done
+    if i > 0 then
+      self.s[i-1] <- 0
+      return true
+    endif
+    return false
+  end
+
+  method print_digit(i, shift)
+    var c <- 0
+    i <- (i bitrs shift) bitand 0xF
+    if i < 0xA then
+      c <- i + '0'
+    else
+      c <- i - 0xA + 'A'
+    endif
+    self.append_char(c)
+  end
+
+  method itoa_rec(i)
+    var c <- i % 10
+    if i > 0 then
+      self.itoa_rec(i / 10)
+      self.append_char(c + '0')
+    endif
+  end
+
+  method itoa(i)
+    self.set(0, 0)
+    if i = 0 then
+      self.append_char('0')
+    else
+      if i < 0 then
+        self.append_char('-')
+        i <- -i
+      endif
+      self.itoa_rec(i)
+    endif
+  end
+
+  method itoa_hex(i, digit)
+    self.set(0, 0)
+    for j <- 0 to digit - 1 do
+      self.print_digit(i, \
+                       (digit - j - 1) * 4)
+    done
+  end
+
+  method atoi()
+    return atoi(self.s)
+  end
+
+  method format(str, vect : args)
+    var buff <- new string(16)
+    var i <- 0
+    var j <- 0
+    var k <- 0
+    var c <- (cstring : str)[i]
+    while c do
+      if c = '%' then
+        i ++ 1
+        c <- str[i]
+        if c = 'd' then
+          buff.itoa(args[k])
+          k ++ 1
+          self.write_from(buff.s, j)
+        elif c = 'x' then
+          buff.itoa_hex(args[k], 4)
+          k ++ 1
+          self.write_from(buff.s, j)
+        elif c = 's' then
+          self.write_from(args[k], j)
+          k ++ 1
+        endif
+        j <- self.length() - 1
+      else
+        self.s[j] <- c
+      endif
+      i ++ 1
+      j ++ 1
+      c <- str[i]
+    done
+    self.s[j] <- 0
+    del buff
+  end
+
+  method upper()
+    self.s <- strupr(self.s)
+  end
+
+  method lower()
+    self.s <- strlwr(self.s)
+  end
+end
